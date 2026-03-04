@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_DB: support_agent_db
       POSTGRES_USER: postgres
@@ -23,6 +23,9 @@ services:
       - postgres
     environment:
       - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=support_agent_db
+      - DB_USER=postgres
       - DB_PASSWORD=postgres123
 
   go-api:

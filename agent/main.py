@@ -4,7 +4,8 @@ from langchain_groq import ChatGroq
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 from tools.sentiment_tool import analyze_sentiment, detect_intent
-from tools.database_tool import search_knowledge_base, save_ticket, save_conversation, save_customer
+from tools.database_tool import save_ticket, save_conversation, save_customer
+from tools.rag_tool import search_knowledge_base_rag, populate_embeddings
 import os
 
 load_dotenv()
@@ -20,15 +21,17 @@ def check_sentiment(query: str) -> str:
     return f"Customer sentiment is {result['sentiment']}"
 
 @tool
-def search_kb(category: str) -> str:
-    """Search knowledge base for answers.
-    Use categories: billing, technical, general"""
-    results = search_knowledge_base(category)
+def search_kb(query: str) -> str:
+    """Search knowledge base using semantic search.
+    Pass the customer's actual message as the query."""
+    results = search_knowledge_base_rag(query)
     if not results:
         return "No relevant information found in knowledge base"
     response = ""
-    for question, answer in results:
-        response += f"Q: {question}\nA: {answer}\n\n"
+    for result in results:
+        response += f"Q: {result['question']}\n"
+        response += f"A: {result['answer']}\n"
+        response += f"Relevance: {result['similarity']}\n\n"
     return response
 
 @tool
@@ -111,6 +114,7 @@ def process_query(query: str, customer_name: str = "Customer", customer_email: s
     print(f"Detected Intent: {intent}\n")
 
     # Run agent
+    populate_embeddings()
     agent = create_agent()
     response = agent.invoke({"input": query})
     agent_response = response.get('output', '')

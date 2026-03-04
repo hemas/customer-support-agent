@@ -41,11 +41,25 @@ def detect_intent(text):
             LanguageCode='en'
         )
         phrases = [phrase['Text'].lower() for phrase in response['KeyPhrases']]
+        text_lower = text.lower()
 
-        # Simple intent detection based on keywords
-        if any(word in phrases for word in ['bill', 'charge', 'payment', 'invoice']):
+        # Billing intent
+        if any(word in text_lower for word in ['bill', 'charge', 'payment', 'invoice', 'subscription', 'plan', 'upgrade', 'discount', 'billed', 'double', 'twice']):
             return 'billing'
-        elif any(word in phrases for word in ['password', 'login', 'error', 'bug', 'crash']):
+        # Security intent
+        elif any(word in text_lower for word in ['hack', 'hacked', 'security', 'password', 'two factor', 'authentication', 'safe', 'encrypt', 'breach']):
+            return 'security'
+        # Shipping intent
+        elif any(word in text_lower for word in ['shipping', 'delivery', 'track', 'order', 'package', 'lost', 'arrived', 'arrive', 'shipped']):
+            return 'shipping'
+        # Refund intent
+        elif any(word in text_lower for word in ['refund', 'return', 'exchange', 'money back', 'cancel']):
+            return 'refund'
+        # Account intent
+        elif any(word in text_lower for word in ['account', 'email', 'username', 'profile', 'picture', 'delete']):
+            return 'account'
+        # Technical intent
+        elif any(word in text_lower for word in ['login', 'error', 'bug', 'crash', 'slow', 'update', 'export', 'technical']):
             return 'technical'
         else:
             return 'general'
