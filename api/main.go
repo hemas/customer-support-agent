@@ -1,3 +1,6 @@
+// NOTE: This Go API was the original request handler.
+// Replaced by Node.js BFF layer (bff/) to support Vue frontend.
+// Kept for reference and architectural history.
 package main
 
 import (

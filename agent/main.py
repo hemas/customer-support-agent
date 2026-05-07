@@ -20,7 +20,7 @@ def check_sentiment(query: str) -> str:
     result = analyze_sentiment(query)
     return f"Customer sentiment is {result['sentiment']}"
 
-@tool
+@tool 
 def search_kb(query: str) -> str:
     """Search knowledge base using semantic search.
     Pass the customer's actual message as the query."""

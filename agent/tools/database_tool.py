@@ -106,3 +106,33 @@ if __name__ == "__main__":
     for question, answer in results:
         print(f"Q: {question}")
         print(f"A: {answer}\n")
+
+#get all the tickets from the database
+def get_all_tickets():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT id, query, sentiment, intent, status, customer_id
+            FROM tickets ORDER BY id DESC
+        """)
+        rows = cursor.fetchall()
+        print(f"Found {len(rows)} tickets")
+        print(rows)
+        tickets = []
+        for row in rows:
+            tickets.append({
+                "id": row[0],
+                "query": row[1],
+                "sentiment": row[2],
+                "intent": row[3],
+                "status": row[4],
+                "customer_id": row[5]
+        })
+            return tickets
+    except Exception as e:
+        print(f"Error fetching tickets: {e}")
+        return []
+    finally:
+        cursor.close()
+        conn.close()

@@ -8,3 +8,6 @@ dist/
 build/
 .idea/
 .vscode/
+node_modules/
+bff/.env
+client/.env
