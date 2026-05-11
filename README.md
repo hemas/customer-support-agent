@@ -2,9 +2,12 @@
 
 A production-grade intelligent customer support system that automatically handles customer queries using AI, detects emotions, searches a knowledge base, and generates empathetic responses.
 
-Built this project to demonstrate production grade AI engineering skills comibing Agentic AI, AQS, ML and modern backend development
+Built to demonstrate production-grade full stack AI engineering 
+skills combining Vue.js, Node.js, Python, Agentic AI, and modern 
+backend development.
 
-## 🏗️ Architecture
+## 🏗️ Architecture Evolution
+### Original Architecture
 ```
 Customer Message
       ↓
@@ -17,32 +20,87 @@ Groq AI (Llama 3) → Response Generation
 PostgreSQL → Data Storage
 ```
 
+### Current Architecture
+```
+Customer Message
+↓
+Vue.js Frontend (Port 5173) — Modern UI
+↓
+Node.js BFF (Port 3000) — API gateway & routing
+↓
+Python AI Agent (Port 8000) — AI processing
+↓
+PostgreSQL — Data storage
+```
+
+
+### Why we evolved
+
+| Component | Before | After | Reason |
+|---|---|---|---|
+| Frontend | None | Vue.js | Modern UI for end users |
+| API Gateway | Go | Node.js BFF | Better fit for Vue frontend |
+| Testing | None | Jest + Vitest | Production grade quality |
+| CI/CD | None | GitHub Actions | Automated deployment |
+
+The Go API (`api/`) is preserved in the codebase as 
+reference for the original architecture. The Node.js BFF 
+replaced it to better support the Vue.js frontend using 
+the Backend For Frontend (BFF) pattern.
+
+
 ## 🛠️ Tech Stack
 
-- **Python** — AI Agent, AWS integration, data processing
-- **Go** — High performance REST API gateway
-- **PostgreSQL** — Customer data, tickets, conversations
-- **AWS Comprehend** — Sentiment analysis and intent detection
-- **LangChain** — Agentic AI framework
-- **Groq AI (Llama 3)** — Free LLM for response generation
-- **Docker** — Containerization
+**Frontend:**
+- Vue.js 3 — Modern reactive frontend
+- Vue Router — Client side navigation
+- Pinia — State management
+- Axios — HTTP requests
+
+**Backend (BFF):**
+- Node.js — JavaScript runtime
+- Express.js — Web framework
+- Morgan — Request logging
+- Jest — Unit testing
+- Supertest — API testing
+
+**AI Agent:**
+- Python — AI logic and data processing
+- FastAPI — Python web framework
+- LangChain — Agentic AI framework
+- Groq AI (Llama 3) — LLM for response generation
+
+**Database:**
+- PostgreSQL — Customer data, tickets, conversations
+- pgvector — Vector embeddings for knowledge base search
+
+**DevOps:**
+- Docker — Containerization
+- GitHub Actions — CI/CD pipeline
 
 ## ✨ Features
 
-- Real-time sentiment analysis using AWS Comprehend
-- Intelligent intent detection (billing, technical, general)
-- Autonomous AI agent that thinks and decides independently
-- Knowledge base search for accurate answers
+- Real-time chat interface with AI responses
+- Switch between AI providers (OpenAI/Groq)
+- Automatic sentiment analysis
+- Intelligent intent detection (billing, technical, shipping)
+- Autonomous AI agent with RAG knowledge base search
 - Automatic escalation to human when needed
+- Support ticket management system
 - Full conversation history saved to PostgreSQL
-- Containerized with Docker for easy deployment
+- Containerized with Docker
+- CI/CD with GitHub Actions
+- Jest + Vitest + Playwright test coverage
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js 18+
+- Python 3.9+
+- PostgreSQL
 - Docker Desktop
-- AWS Account with Comprehend access
 - Groq API key (free at console.groq.com)
+
 
 ### Setup
 
@@ -64,73 +122,158 @@ DB_NAME=support_agent_db
 DB_USER=postgres
 DB_PASSWORD=postgres123
 ```
+# bff/.env
+PORT=3000
+PYTHON_SERVICE_URL=http://localhost:8000
+CLIENT_URL=http://localhost:5173
 
-3. Start everything:
+3. Install dependencies:
 ```bash
-docker-compose up -d
+# Install Python dependencies
+pip3 install -r requirements.txt
+
+# Install Node.js BFF dependencies
+cd bff && npm install
+
+# Install Vue frontend dependencies
+cd ../client && npm install
 ```
 
-4. Test it:
+4. Start all services:
 ```bash
-curl -X POST http://localhost:8080/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customer_name": "John Smith",
-    "customer_email": "john@example.com",
-    "query": "I was charged twice this month!"
-  }'
+# Terminal 1 - Python AI Agent
+cd agent && python3 api.py
+
+# Terminal 2 - Node.js BFF
+cd bff && node src/index.js
+
+# Terminal 3 - Vue Frontend
+cd client && npm run dev
 ```
 
-## 📁 Project Structure
-```
+4. Open browser:
+    http://localhost:5173
+
+    ## 📁 Project Structure
+    ```
 customer-support-agent/
-├── agent/
-│   ├── main.py          # AI Agent brain
-│   ├── api.py           # FastAPI service
+├── agent/                    # Python AI Agent
+│   ├── api.py               # FastAPI endpoints
+│   ├── main.py              # AI agent logic
 │   └── tools/
-│       ├── sentiment_tool.py   # AWS Comprehend
-│       └── database_tool.py    # PostgreSQL
-├── api/
-│   └── main.go          # Go API gateway
+│       ├── sentiment_tool.py # Sentiment analysis
+│       ├── rag_tool.py      # Knowledge base search
+│       └── database_tool.py # PostgreSQL operations
+├── api/                     # Original Go API (preserved)
+│   └── main.go              # Go API gateway
+├── bff/                     # Node.js BFF
+│   ├── src/
+│   │   ├── index.js         # Express server
+│   │   └── routes/
+│   │       ├── chat.js      # Chat routes
+│   │       └── tickets.js   # Ticket routes
+│   └── tests/               # Jest tests
+│       ├── chat.test.js
+│       └── tickets.test.js
+├── client/                  # Vue.js Frontend
+│   └── src/
+│       ├── App.vue          # Root component
+│       ├── router/          # Vue Router
+│       └── views/
+│           ├── ChatView.vue    # Chat page
+│           └── TicketsView.vue # Tickets page
 ├── database/
-│   └── schema.sql       # Database schema
+│   └── schema.sql           # PostgreSQL schema
 ├── docker-compose.yml
 └── requirements.txt
 ```
 
 ## 🔄 How It Works
 
-1. Customer sends message to Go API
-2. Go API forwards to Python AI Agent
-3. AWS Comprehend detects sentiment and intent
-4. LangChain Agent searches knowledge base
-5. Groq AI generates empathetic response
-6. Full conversation saved to PostgreSQL
-7. Response returned to customer
+1. User opens Vue.js frontend at localhost:5173
+2. User types message and selects AI provider (OpenAI/Groq)
+3. Vue sends POST request to Node.js BFF
+4. Node.js validates and forwards to Python agent
+5. Python detects sentiment and intent
+6. LangChain agent searches knowledge base using pgvector
+7. Groq AI generates empathetic response
+8. Ticket saved to PostgreSQL
+9. Response returned through Node.js to Vue
+10. User sees AI response in chat window
 
 ## 📝 API Endpoints
 
-### POST /query
-Send a customer message and get AI response.
+### Node.js BFF (Port 3000)
 
-Request:
+**GET /health**
 ```json
+Response:
 {
-  "customer_name": "John Smith",
-  "customer_email": "john@example.com",
-  "query": "I was charged twice this month!"
+  "status": "ok"
 }
 ```
+
+**POST /api/chat/process**
+```json
+Request:
+{
+  "message": "I need help with my order",
+  "customer_name": "John",
+  "customer_email": "john@email.com",
+  "provider": "groq"
+}
 
 Response:
-```json
 {
-  "ticket_id": 1,
-  "response": "I understand your frustration...",
-  "sentiment": "NEGATIVE",
-  "intent": "billing"
+  "ticket_id": 15,
+  "response": "I understand your concern...",
+  "sentiment": "NEUTRAL",
+  "intent": "shipping"
 }
 ```
+
+**GET /api/tickets**
+```json
+Response:
+[
+  {
+    "id": 15,
+    "query": "I need help with my order",
+    "sentiment": "NEUTRAL",
+    "intent": "shipping",
+    "status": "open"
+  }
+]
+```
+
+**PUT /api/tickets/:id**
+```json
+Request:
+{
+  "status": "resolved"
+}
+
+Response:
+{
+  "id": 15,
+  "status": "resolved"
+}
+```
+
+## 🧪 Running Tests
+
+```bash
+# Jest tests (Node.js BFF)
+cd bff && npm test
+
+# Vitest tests (Vue frontend) - coming soon
+cd client && npm run test
+
+# Playwright E2E tests - coming soon
+cd client && npm run test:e2e
+```
+
 ## 👨‍💻 Author
+
 Hema Pappu
 - GitHub: github.com/hemas
