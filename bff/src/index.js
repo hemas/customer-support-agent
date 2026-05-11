@@ -28,8 +28,8 @@ app.get('/health', (req,res) => {
     res.json({status: 'ok' })
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`BFF running on http://localhost:${PORT}`);
 })
 
-module.exports = app;
+module.exports = { app, server };
